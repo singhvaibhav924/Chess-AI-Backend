@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-model = None
+model = Model_handler()
 
 @app.route('/')
 def hello_world():
@@ -18,5 +18,4 @@ def generate_move() :
 
 
 if __name__ == '__main__':
-   model = Model_handler()
    app.run(port = "1303")
