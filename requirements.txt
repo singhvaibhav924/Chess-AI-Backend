@@ -3,4 +3,5 @@ numpy
 python-chess
 Flask
 Flask-Cors
-requests 
+requests
+gunicorn
