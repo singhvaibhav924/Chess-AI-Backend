@@ -15,3 +15,6 @@ def hello_world():
 def generate_move() :
    data = request.get_json()
    return model.predict(data['state'], data['turn'])
+
+if __name__ == '__main__':
+   app.run()

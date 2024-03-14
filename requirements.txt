@@ -4,4 +4,3 @@ python-chess
 Flask
 Flask-Cors
 requests
-gunicorn
