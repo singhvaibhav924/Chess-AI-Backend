@@ -12,9 +12,10 @@ class Model_handler :
     input_data = self.convert_state_to_input(state, color)
     input_details = self.interpreter.get_input_details()
     output_details = self.interpreter.get_output_details()
-
+    print(input_details)
+    print(output_details)
     self.interpreter.set_tensor(input_details[0]['index'], input_data[0])
-    self.interpreter.set_tensor(input_details[1]['index'], input_data[1])
+    #self.interpreter.set_tensor(input_details[1]['index'], input_data[1])
     
     self.interpreter.invoke()
     
@@ -25,8 +26,8 @@ class Model_handler :
   def convert_state_to_input(self, state, color) :
     if type(state) == str :
       temp = state.split("_")
-      temp_arr = np.zeros((8,8,12), dtype = np.float16)
-      arr2 = np.zeros((8,8,10), dtype = np.float16)
+      temp_arr = np.zeros((8,8,12), dtype = np.float32)
+      arr2 = np.zeros((8,8,10), dtype = np.float32)
       temp_arr, arr2 = self.convert_board_to_input(temp[-1], color)
       for i in range(1,5) :
         temp_arr = np.concatenate([self.convert_board_to_input(temp[-1-i], color, False), temp_arr], axis = 2)
@@ -36,8 +37,8 @@ class Model_handler :
     if current :
       board = chess.Board(state)
       board.turn = color
-      arr = np.zeros((8,8,12), dtype = np.float16)
-      arr2 = np.zeros((8,8,10), dtype = np.float16)
+      arr = np.zeros((8,8,12), dtype = np.float32)
+      arr2 = np.zeros((8,8,10), dtype = np.float32)
       piece_to_value = self.get_piece_to_value(color)
       piece_to_value2 = self.get_piece_to_value(color, False)
       for i in range(64) :
@@ -55,7 +56,7 @@ class Model_handler :
             piece_to_value2[symbol] += 1
       return (arr, arr2)
     else :
-      arr = np.zeros((8,8,12), dtype = np.float16)
+      arr = np.zeros((8,8,12), dtype = np.float32)
       if len(state) == 0 :
         return arr
       board = chess.Board(state)
@@ -67,7 +68,7 @@ class Model_handler :
       return arr
     
   def convert_output_to_probs(self, state, color, policy_output) :
-    policy = tf.reshape(policy_output, [8,8,10])
+    policy = np.reshape(policy_output, [8,8,10])
     board = chess.Board(state.split("_")[-1])
     board.turn = color
     piece_to_value = self.get_piece_to_value(color,False)
@@ -84,7 +85,7 @@ class Model_handler :
           piece_to_value[board.piece_at(from_square).symbol()] += 1
    # print(list(board.legal_moves))
     move = [item[0] for item in sorted(move_dict.items(), key = lambda x: x[1], reverse = True)][0]
-    print(move_dict[move])
+    print(move)
     return move
   
   def get_piece_to_value(self, color, inp = True) :
