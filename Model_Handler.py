@@ -1,16 +1,26 @@
 import numpy as np
 import chess
-import tensorflow as tf
-from keras.models import load_model
+import tflite_runtime.interpreter as tflite
 
 class Model_handler :
   def __init__(self) :
-    self.model = load_model("model.h5")
+    self.interpreter = tflite.Interpreter(model_path="model.tflite")
+    self.interpreter.allocate_tensors()
     print("Model loaded and is ready to use !!!")
 
   def predict(self, state, color) :
-    prediction = self.model(self.convert_state_to_input(state, color))
-    return self.convert_output_to_probs(state, color, prediction[1][0])
+    input_data = self.convert_state_to_input(state, color)
+    input_details = self.interpreter.get_input_details()
+    output_details = self.interpreter.get_output_details()
+
+    self.interpreter.set_tensor(input_details[0]['index'], input_data[0])
+    self.interpreter.set_tensor(input_details[1]['index'], input_data[1])
+    
+    self.interpreter.invoke()
+    
+    output_data = self.interpreter.get_tensor(output_details[0]['index'])
+        
+    return self.convert_output_to_probs(state, color, output_data[0])
 
   def convert_state_to_input(self, state, color) :
     if type(state) == str :
