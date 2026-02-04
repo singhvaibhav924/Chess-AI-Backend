@@ -11,6 +11,10 @@ model = Model_handler()
 def hello_world():
    return 'Hello World'
 
+@app.route("/health")
+def health():
+    return {"status": "ok"}, 200
+
 @app.route('/generateMove', methods = ["POST"])
 def generate_move() :
    data = request.get_json()
